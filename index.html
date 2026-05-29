@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SRS-2 - Formulário Adulto Heterorrelato</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 850px;
+            background: #fff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 5px;
+            font-size: 24px;
+        }
+        h2 {
+            color: #4a5568;
+            text-align: center;
+            margin-top: 0;
+            font-size: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+        .instructions {
+            background-color: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 30px;
+            background: #f7fafc;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #edf2f7;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group.row-flex {
+            flex-direction: row;
+            align-items: center;
+            gap: 15px;
+            margin-top: 10px;
+        }
+        label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="date"] {
+            padding: 8px;
+            border: 1px solid #cbd5e0;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .scale-legend {
+            display: flex;
+            justify-content: space-around;
+            background: #edf2f7;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 13px;
+            margin-bottom: 20px;
+        }
+        .item-row {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            border-bottom: 1px solid #edf2f7;
+        }
+        .item-row:nth-child(even) {
+            background-color: #fcfcfc;
+        }
+        .item-text {
+            flex: 1;
+            padding-right: 20px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        .item-options {
+            display: flex;
+            gap: 15px;
+            justify-content: flex-end;
+            min-width: 160px;
+        }
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+        button {
+            background-color: #2b6cb0;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover {
+            background-color: #2b529a;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Formulário Adulto Heterorrelato</h1>
+    <h2>SRS-2 (Escala de Responsividade Social)</h2>
+
+    <div class="instructions">
+        <strong>INSTRUÇÕES:</strong> Em cada questão, por favor selecione a opção que melhor descreva o comportamento da pessoa nos últimos 6 meses.<br>
+        <strong>1</strong> = Não é verdade | <strong>2</strong> = Algumas vezes é verdade | <strong>3</strong> = Muitas vezes é verdade | <strong>4</strong> = Quase sempre é verdade
+    </div>
+
+    <form id="srs2Form">
+        <div class="meta-grid">
+            <div class="form-group">
+                <label for="nomeAvaliado">Nome do avaliado:</label>
+                <input type="text" id="nomeAvaliado" required>
+            </div>
+            <div class="form-group">
+                <label for="dataNascimento">Data de nascimento:</label>
+                <input type="date" id="dataNascimento" required>
+            </div>
+            <div class="form-group">
+                <label for="dataAvaliacao">Data da avaliação:</label>
+                <input type="date" id="dataAvaliacao" required>
+            </div>
+            <div class="form-group">
+                <label>Sexo:</label>
+                <div class="form-group row-flex">
+                    <label class="radio-label"><input type="radio" name="sexo" value="M" required> M</label>
+                    <label class="radio-label"><input type="radio" name="sexo" value="F"> F</label>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="nomeRespondente">Nome do respondente:</label>
+                <input type="text" id="nomeRespondente" required>
+            </div>
+            <div class="form-group">
+                <label>Grau de Parentesco / Relação:</label>
+                <div class="form-group row-flex">
+                    <label class="radio-label"><input type="radio" name="relacao" value="Mãe/Pai" required> Mãe/Pai</label>
+                    <label class="radio-label"><input type="radio" name="relacao" value="Cônjuge"> Cônjuge</label>
+                    <label class="radio-label"><input type="radio" name="relacao" value="Outro"> Outro</label>
+                </div>
+            </div>
+        </div>
+
+        <div class="scale-legend">
+            <span>1 = Não é verdade</span>
+            <span>2 = Algumas vezes</span>
+            <span>3 = Muitas vezes</span>
+            <span>4 = Quase sempre</span>
+        </div>
+
+        <div id="quizItems"></div>
+
+        <div class="btn-container">
+            <button type="submit" id="btnEnviar">Enviar Respostas</button>
+        </div>
+    </form>
+</div>
+
+<!-- Lógica do Firebase usando Módulos (TAG) -->
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyCocyGvi4Si0Mdfdg2CtZuw_7FmFqAwTX4",
+        authDomain: "transporte-fds.firebaseapp.com",
+        projectId: "transporte-fds",
+        storageBucket: "transporte-fds.firebasestorage.app",
+        messagingSenderId: "489507277792",
+        appId: "1:489507277792:web:b40b649f7a789499a27985",
+        measurementId: "G-PEB2TCWF5X"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // Lista de perguntas do SRS-2
+    const itens = [
+        "Parece muito mais desconfortável em situações sociais do que quando está sozinha.",
+        "As expressões em seu rosto não combinam com o que está dizendo.",
+        "Parece confiante (ou segura) quando está interagindo com outras pessoas.",
+        "Quando há sobrecarga de estímulos, apresenta padrões rígidos e inflexíveis de comportamento, aparentemente estranhos.",
+        "Não percebe quando os outros estão tentando tirar vantagem dela.",
+        "Prefere estar sozinha do que com os outros.",
+        "Demonstra perceber o que os outros estão pensando ou sentindo.",
+        "Se comporta de maneira estranha ou bizarra.",
+        "Precisa da ajuda de outras pessoas para satisfazer suas necessidades básicas.",
+        "Leva as coisas muito \"ao pé da letra\" e não compreende o real significado de uma conversa.",
+        "É autoconfiante.",
+        "É capaz de comunicar seus sentimentos para as outras pessoas.",
+        "É estranha na \"tomada de vez\" das interações com seus colegas (por exemplo, não parece entender a reciprocidade de uma conversa).",
+        "Não tem boa coordenação.",
+        "Reconhece e responde de forma apropriada às mudanças no tom de voz e expressões faciais de outras pessoas.",
+        "Evita o contato visual ou tem contato visual diferente.",
+        "Reconhece quando algo é injusto.",
+        "Tem dificuldade em fazer amigos, mesmo tentando dar o melhor de si.",
+        "Fica frustrada tentando expressar suas ideias em uma conversa.",
+        "Mostra interesses sensoriais incomuns (por exemplo, cheirar seus dedos com frequência) ou estranhos, chacoalha repetidamente pequenos itens.",
+        "É capaz de imitar ações e comportamento de outras pessoas quando é socialmente apropriado fazê-lo.",
+        "Interage apropriadamente com outros adultos.",
+        "Não participa de atividades em grupo e eventos sociais a menos que seja convidada a fazê-lo.",
+        "Tem mais dificuldade do que outras pessoas com mudanças em sua rotina.",
+        "Não parece se importar em estar fora de sintonia ou em um \"mundo\" diferente dos outros.",
+        "Oferece conforto para os outros quando estão tristes.",
+        "Evita iniciar interações sociais com outros adultos.",
+        "Pensa ou fala sobre a mesma coisa repetidamente.",
+        "É considerada estranha ou esquisita pelas outras pessoas.",
+        "Fica perturbada em uma situação com muitas coisas acontecendo.",
+        "Não consegue tirar algo da sua mente uma vez que começa a pensar sobre isso.",
+        "Tem boa higiene pessoal.",
+        "É socialmente desajeitada, mesmo quando tenta ser educada.",
+        "Evita pessoas que querem se aproximar dela por meio de contato afetivo.",
+        "Tem dificuldade em acompanhar o fluxo de uma conversa normal.",
+        "Tem dificuldade em se relacionar com os membros da família.",
+        "Tem dificuldade em se relacionar com adultos.",
+        "Responde adequadamente às mudanças de humor das outras pessoas (por exemplo, quando o humor de um amigo muda de feliz para triste).",
+        "Tem uma variedade de interesses extraordinariamente incomuns.",
+        "É imaginativa sem perder contato com a realidade.",
+        "Muda de uma atividade para outra sem objetivo aparente.",
+        "Parece excessivamente sensível aos sons, texturas ou cheiros.",
+        "Gosta de se mostrar \"boa de conversa\" (conversa informal com os outros).",
+        "Não entende como os acontecimentos estão relacionados entre si (causa e efeito), da mesma forma que outros adultos.",
+        "Geralmente fica interessada no que as pessoas próximas estão prestando atenção.",
+        "Tem expressão facial excessivamente séria.",
+        "Ri em momentos inapropriados.",
+        "Tem senso de humor e entende as piadas.",
+        "É extremamente hábil em tarefas intelectuais ou computacionais, mas não consegue fazer tão bem a maioria das outras tarefas.",
+        "Têm comportamentos estranhos e repetitivos.",
+        "Tem dificuldade em responder perguntas diretamente e acaba falando em torno do assunto.",
+        "Sabe quando está falando muito alto ou fazendo muito barulho.",
+        "Fala com as pessoas com um tom de voz incomum (por exemplo, fala como um robô ou como se estivesse dando uma palestra).",
+        "Parece agir com as pessoas como se elas fossem objetos.",
+        "Sabe quando está muito próxima ou invadindo o espaço de alguém.",
+        "Caminha entre duas pessoas que estão conversando.",
+        "Isolada; tende a não deixar sua casa.",
+        "Concentra-se demais em partes das coisas ao invés de ver o todo.",
+        "É excessivamente desconfiada.",
+        "É emocionalmente distante, não demonstrando seus sentimentos.",
+        "É inflexível e tem dificuldade para mudar de ideia.",
+        "Dá explicações incomuns ou ilógicas do porquê de fazer as coisas.",
+        "Toca ou cumprimenta os outros de uma maneira incomum.",
+        "Fica muito agitada em situações sociais.",
+        "Fica com olhar perdido ou olha fixamente para o nada."
+    ];
+
+    // Renderizar os itens na tela
+    const container = document.getElementById('quizItems');
+    itens.forEach((texto, index) => {
+        const itemNum = index + 1;
+        const row = document.createElement('div');
+        row.className = 'item-row';
+        row.innerHTML = `
+            <div class="item-text"><strong>${itemNum}.</strong> ${texto}</div>
+            <div class="item-options">
+                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="1" required> 1</label>
+                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="2"> 2</label>
+                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="3"> 3</label>
+                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="4"> 4</label>
+            </div>
+        `;
+        container.appendChild(row);
+    });
+
+    // Enviar dados para o Firestore ao enviar o formulário
+    document.getElementById('srs2Form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('btnEnviar');
+        btn.disabled = true;
+        btn.innerText = "Enviando...";
+
+        // Monta o objeto com as respostas das perguntas
+        const respostasPerguntas = {};
+        itens.forEach((_, index) => {
+            const itemNum = index + 1;
+            const valor = document.querySelector(`input[name="p_${itemNum}"]:checked`).value;
+            respostasPerguntas[`item_${itemNum}`] = parseInt(valor);
+        });
+
+        // Junta com os metadados do paciente
+        const payload = {
+            nomeAvaliado: document.getElementById('nomeAvaliado').value,
+            dataNascimento: document.getElementById('dataNascimento').value,
+            dataAvaliacao: document.getElementById('dataAvaliacao').value,
+            sexo: document.querySelector('input[name="sexo"]:checked').value,
+            nomeRespondente: document.getElementById('nomeRespondente').value,
+            relacao: document.querySelector('input[name="relacao"]:checked').value,
+            respostas: respostasPerguntas,
+            enviadoEm: new Date().toISOString()
+        };
+
+        try {
+            // Salva na coleção "respostas_srs2" no Firestore
+            await addDoc(collection(db, "respostas_srs2"), payload);
+            alert("Formulário enviado com sucesso para a nuvem!");
+            document.getElementById('srs2Form').reset();
+        } catch (error) {
+            console.error("Erro ao salvar:", error);
+            alert("Ocorreu um erro ao salvar os dados. Verifique o console.");
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "Enviar Respostas";
+        }
+    });
+</script>
+
+</body>
+</html>
