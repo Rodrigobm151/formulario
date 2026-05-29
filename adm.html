@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - SRS-2</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" integrity="sha384-S8D9vNkiW/X5f+tAsr802w3T6n6CqZHe4I04QInO+ZfH5f66g9q1D0W1D4O/E/f6" crossorigin="anonymous"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1100px;
+            background: #fff;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 20px;
+            font-size: 24px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 15px;
+        }
+        .btn-box {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        button {
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-refresh { background-color: #4a5568; }
+        .btn-refresh:hover { background-color: #2d3748; }
+        .btn-excel { background-color: #2f855a; }
+        .btn-excel:hover { background-color: #22543d; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+        }
+        th {
+            background-color: #ebf8ff;
+            color: #2b6cb0;
+            font-weight: bold;
+        }
+        tr:hover { background-color: #f7fafc; }
+        .loading {
+            text-align: center;
+            font-style: italic;
+            color: #718096;
+            padding: 20px;
+        }
+        .action-btn {
+            background-color: #3182ce;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        .action-btn:hover { background-color: #2b6cb0; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Painel de Controle - Respostas do SRS-2</h1>
+
+    <div class="btn-box">
+        <button class="btn-refresh" id="btnCarregar">🔄 Atualizar Dados</button>
+        <button class="btn-excel" id="btnExportarTudo">📥 Exportar Tudo para Excel</button>
+    </div>
+
+    <div id="status" class="loading">Clique em 'Atualizar Dados' para buscar registros...</div>
+
+    <table id="tabelaRespostas" style="display: none;">
+        <thead>
+            <tr>
+                <th>Data do Envio</th>
+                <th>Nome do Avaliado</th>
+                <th>Data Nasc.</th>
+                <th>Sexo</th>
+                <th>Respondente (Grau)</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <tbody id="corpoTabela">
+            </tbody>
+    </table>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+    // ⚠️ COLE AS MESMAS CREDENCIAIS DO SEU INDEX.HTML AQUI
+    const firebaseConfig = {
+        apiKey: "COLE_AQUI_SUA_API_KEY",
+        authDomain: "COLE_AQUI_SEU_AUTH_DOMAIN",
+        projectId: "COLE_AQUI_SEU_PROJECT_ID",
+        storageBucket: "COLE_AQUI_SEU_STORAGE_BUCKET",
+        messagingSenderId: "COLE_AQUI_MESSAGING_SENDER_ID",
+        appId: "COLE_AQUI_SUA_APP_ID"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    
+    let dadosLocais = []; // Guarda os dados vindos do Firebase temporariamente
+
+    const btnCarregar = document.getElementById('btnCarregar');
+    const btnExportarTudo = document.getElementById('btnExportarTudo');
+    const status = document.getElementById('status');
+    const tabela = document.getElementById('tabelaRespostas');
+    const corpoTabela = document.getElementById('corpoTabela');
+
+    // Função para buscar dados no Firebase
+    async function puxarDados() {
+        status.style.display = "block";
+        status.innerText = "Buscando dados no Firebase...";
+        tabela.style.display = "none";
+        corpoTabela.innerHTML = "";
+        dadosLocais = [];
+
+        try {
+            // Ordena os envios pelos mais recentes
+            const q = query(collection(db, "respostas_srs2"), orderBy("enviadoEm", "desc"));
+            const querySnapshot = await getDocs(q);
+            
+            if (querySnapshot.empty) {
+                status.innerText = "Nenhum formulário encontrado no banco de dados.";
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const item = doc.data();
+                item.id = doc.id; // guarda o id do documento
+                dadosLocais.push(item);
+
+                // Formata a data de envio para exibição legível
+                const dataFormatada = item.enviadoEm ? new Date(item.enviadoEm).toLocaleString('pt-BR') : 'N/A';
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${dataFormatada}</td>
+                    <td><strong>${item.nomeAvaliado}</strong></td>
+                    <td>${item.dataNascimento.split('-').reverse().join('/')}</td>
+                    <td>${item.sexo}</td>
+                    <td>${item.nomeRespondente} (${item.relacao})</td>
+                    <td>
+                        <button class="action-btn" data-id="${item.id}">Baixar este Excel</button>
+                    </td>
+                `;
+                corpoTabela.appendChild(tr);
+            });
+
+            status.style.display = "none";
+            tabela.style.display = "table";
+
+            // Adiciona evento nos botões individuais de download
+            document.querySelectorAll('.action-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.getAttribute('data-id');
+                    baixarExcelIndividual(id);
+                });
+            });
+
+        } catch (error) {
+            console.error("Erro ao buscar dados:", error);
+            status.innerText = "Erro de conexão ou permissão negada no Firebase.";
+        }
+    }
+
+    // Exporta apenas 1 paciente no formato vertical clássico (Igual ao que fizemos no início)
+    function baixarExcelIndividual(id) {
+        const paciente = dadosLocais.find(d => d.id === id);
+        if (!paciente) return;
+
+        const estrutura = [
+            ["MÉTRICA / IDENTIFICAÇÃO", "VALOR"],
+            ["Nome do Avaliado", paciente.nomeAvaliado],
+            ["Data de Nascimento", paciente.dataNascimento],
+            ["Data da Avaliação", paciente.dataAvaliacao],
+            ["Sexo", paciente.sexo],
+            ["Nome do Respondente", paciente.nomeRespondente],
+            ["Relação", paciente.relacao],
+            ["Enviado via Web em", paciente.enviadoEm],
+            [], 
+            ["Nº ITEM", "RESPOSTA (1 a 4)"]
+        ];
+
+        // Adiciona as 65 respostas ordenadas
+        for (let i = 1; i <= 65; i++) {
+            estrutura.push([`Item ${i}`, paciente.respostas[`item_${i}`] || "Não respondido"]);
+        }
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(estrutura);
+        ws['!cols'] = [{ wch: 25 }, { wch: 30 }];
+        XLSX.utils.book_append_sheet(wb, ws, "Resultado SRS-2");
+        XLSX.writeFile(wb, `SRS2_${paciente.nomeAvaliado.replace(/\s+/g, '_')}.xlsx`);
+    }
+
+    // Exporta TODOS os registros do banco em formato de tabela horizontal (ótimo para pesquisas estatísticas)
+    function exportarTudoParaExcel() {
+        if (dadosLocais.length === 0) {
+            alert("Não há dados carregados para exportar.");
+            return;
+        }
+
+        // Monta o cabeçalho: dados do paciente + colunas de Item 1 até Item 65
+        const cabecalho = ["Nome do Avaliado", "Data Nasc.", "Data Avaliação", "Sexo", "Respondente", "Relação", "Data Envio"];
+        for (let i = 1; i <= 65; i++) {
+            cabecalho.push(`Item ${i}`);
+        }
+
+        const matrizExcel = [cabecalho];
+
+        // Varre cada paciente adicionando uma linha horizontal correspondente
+        dadosLocais.forEach(p => {
+            const linha = [
+                p.nomeAvaliado,
+                p.dataNascimento,
+                p.dataAvaliacao,
+                p.sexo,
+                p.nomeRespondente,
+                p.relacao,
+                p.enviadoEm
+            ];
+            for (let i = 1; i <= 65; i++) {
+                linha.push(p.respostas[`item_${i}`] || "");
+            }
+            matrizExcel.push(linha);
+        });
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(matrizExcel);
+        XLSX.utils.book_append_sheet(wb, ws, "Consolidado Geral");
+        XLSX.writeFile(wb, "SRS2_Banco_De_Dados_Geral.xlsx");
+    }
+
+    btnCarregar.addEventListener('click', puxarDados);
+    btnExportarTudo.addEventListener('click', exportarTudoParaExcel);
+
+    // Carrega os dados automaticamente ao abrir a página
+    puxarDados();
+</script>
+
+</body>
+</html>
