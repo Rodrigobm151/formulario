@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel Administrativo - SRS-2</title>
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" integrity="sha384-S8D9vNkiW/X5f+tAsr802w3T6n6CqZHe4I04QInO+ZfH5f66g9q1D0W1D4O/E/f6" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -76,6 +76,7 @@
             background-color: #3182ce;
             padding: 5px 10px;
             font-size: 12px;
+            border-radius: 3px;
         }
         .action-btn:hover { background-color: #2b6cb0; }
     </style>
@@ -90,7 +91,7 @@
         <button class="btn-excel" id="btnExportarTudo">📥 Exportar Tudo para Excel</button>
     </div>
 
-    <div id="status" class="loading">Clique em 'Atualizar Dados' para buscar registros...</div>
+    <div id="status" class="loading">Buscando registros...</div>
 
     <table id="tabelaRespostas" style="display: none;">
         <thead>
@@ -110,9 +111,9 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ⚠️ COLE AS MESMAS CREDENCIAIS DO SEU INDEX.HTML AQUI
+    // ⚠️ COLOQUE SUAS CREDENCIAIS REAIS AQUI ABAIXO
     const firebaseConfig = {
         apiKey: "COLE_AQUI_SUA_API_KEY",
         authDomain: "COLE_AQUI_SEU_AUTH_DOMAIN",
@@ -125,7 +126,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     
-    let dadosLocais = []; // Guarda os dados vindos do Firebase temporariamente
+    let dadosLocais = [];
 
     const btnCarregar = document.getElementById('btnCarregar');
     const btnExportarTudo = document.getElementById('btnExportarTudo');
@@ -133,7 +134,6 @@
     const tabela = document.getElementById('tabelaRespostas');
     const corpoTabela = document.getElementById('corpoTabela');
 
-    // Função para buscar dados no Firebase
     async function puxarDados() {
         status.style.display = "block";
         status.innerText = "Buscando dados no Firebase...";
@@ -142,7 +142,7 @@
         dadosLocais = [];
 
         try {
-            // Ordena os envios pelos mais recentes
+            // Consulta direta e sem ordenação forçada para evitar travamento por falta de índice
             const q = query(collection(db, "respostas_srs2"));
             const querySnapshot = await getDocs(q);
             
@@ -153,19 +153,19 @@
 
             querySnapshot.forEach((doc) => {
                 const item = doc.data();
-                item.id = doc.id; // guarda o id do documento
+                item.id = doc.id;
                 dadosLocais.push(item);
 
-                // Formata a data de envio para exibição legível
                 const dataFormatada = item.enviadoEm ? new Date(item.enviadoEm).toLocaleString('pt-BR') : 'N/A';
+                const dataNascFmt = item.dataNascimento ? item.dataNascimento.split('-').reverse().join('/') : 'N/A';
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${dataFormatada}</td>
-                    <td><strong>${item.nomeAvaliado}</strong></td>
-                    <td>${item.dataNascimento.split('-').reverse().join('/')}</td>
-                    <td>${item.sexo}</td>
-                    <td>${item.nomeRespondente} (${item.relacao})</td>
+                    <td><strong>${item.nomeAvaliado || 'Sem Nome'}</strong></td>
+                    <td>${dataNascFmt}</td>
+                    <td>${item.sexo || '-'}</td>
+                    <td>${item.nomeRespondente || '-'} (${item.relacao || '-'})</td>
                     <td>
                         <button class="action-btn" data-id="${item.id}">Baixar este Excel</button>
                     </td>
@@ -173,10 +173,12 @@
                 corpoTabela.appendChild(tr);
             });
 
+            // Ordena localmente os dados na tabela para mostrar o mais recente em primeiro lugar
+            dadosLocais.sort((a, b) => new Date(b.enviadoEm) - new Date(a.enviadoEm));
+
             status.style.display = "none";
             tabela.style.display = "table";
 
-            // Adiciona evento nos botões individuais de download
             document.querySelectorAll('.action-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = e.target.getAttribute('data-id');
@@ -190,7 +192,6 @@
         }
     }
 
-    // Exporta apenas 1 paciente no formato vertical clássico (Igual ao que fizemos no início)
     function baixarExcelIndividual(id) {
         const paciente = dadosLocais.find(d => d.id === id);
         if (!paciente) return;
@@ -208,9 +209,8 @@
             ["Nº ITEM", "RESPOSTA (1 a 4)"]
         ];
 
-        // Adiciona as 65 respostas ordenadas
         for (let i = 1; i <= 65; i++) {
-            estrutura.push([`Item ${i}`, paciente.respostas[`item_${i}`] || "Não respondido"]);
+            estrutura.push([`Item ${i}`, paciente.respostas ? paciente.respostas[`item_${i}`] : "N/A"]);
         }
 
         const wb = XLSX.utils.book_new();
@@ -220,14 +220,12 @@
         XLSX.writeFile(wb, `SRS2_${paciente.nomeAvaliado.replace(/\s+/g, '_')}.xlsx`);
     }
 
-    // Exporta TODOS os registros do banco em formato de tabela horizontal (ótimo para pesquisas estatísticas)
     function exportarTudoParaExcel() {
         if (dadosLocais.length === 0) {
             alert("Não há dados carregados para exportar.");
             return;
         }
 
-        // Monta o cabeçalho: dados do paciente + colunas de Item 1 até Item 65
         const cabecalho = ["Nome do Avaliado", "Data Nasc.", "Data Avaliação", "Sexo", "Respondente", "Relação", "Data Envio"];
         for (let i = 1; i <= 65; i++) {
             cabecalho.push(`Item ${i}`);
@@ -235,7 +233,6 @@
 
         const matrizExcel = [cabecalho];
 
-        // Varre cada paciente adicionando uma linha horizontal correspondente
         dadosLocais.forEach(p => {
             const linha = [
                 p.nomeAvaliado,
@@ -247,7 +244,7 @@
                 p.enviadoEm
             ];
             for (let i = 1; i <= 65; i++) {
-                linha.push(p.respostas[`item_${i}`] || "");
+                linha.push(p.respostas ? p.respostas[`item_${i}`] : "");
             }
             matrizExcel.push(linha);
         });
@@ -261,7 +258,7 @@
     btnCarregar.addEventListener('click', puxarDados);
     btnExportarTudo.addEventListener('click', exportarTudoParaExcel);
 
-    // Carrega os dados automaticamente ao abrir a página
+    // Tenta carregar automaticamente ao entrar
     puxarDados();
 </script>
 
