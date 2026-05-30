@@ -74,43 +74,46 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        .scale-legend {
-            display: flex;
-            justify-content: space-around;
-            background: #edf2f7;
-            padding: 10px;
-            border-radius: 4px;
-            font-weight: bold;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-        .item-row {
-            display: flex;
-            align-items: center;
-            padding: 12px 10px;
+        .item-container {
+            padding: 15px 10px;
             border-bottom: 1px solid #edf2f7;
         }
-        .item-row:nth-child(even) {
+        .item-container:nth-child(even) {
             background-color: #fcfcfc;
         }
         .item-text {
-            flex: 1;
-            padding-right: 20px;
-            font-size: 14px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
             line-height: 1.4;
         }
-        .item-options {
+        .item-options-inline {
             display: flex;
+            flex-wrap: wrap;
             gap: 15px;
-            justify-content: flex-end;
-            min-width: 160px;
+            padding-left: 5px;
         }
         .radio-label {
             display: flex;
             align-items: center;
-            gap: 4px;
+            gap: 6px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13.5px;
+            color: #4a5568;
+            background: #f7fafc;
+            padding: 6px 12px;
+            border-radius: 20px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.2s;
+        }
+        .radio-label:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+        .radio-label input[type="radio"]:checked + span {
+            font-weight: bold;
+            color: #2b6cb0;
         }
         .btn-container {
             margin-top: 30px;
@@ -139,8 +142,7 @@
     <h2>SRS-2 (Escala de Responsividade Social)</h2>
 
     <div class="instructions">
-        <strong>INSTRUÇÕES:</strong> Em cada questão, por favor selecione a opção que melhor descreva o comportamento da pessoa nos últimos 6 meses.<br>
-        <strong>1</strong> = Não é verdade | <strong>2</strong> = Algumas vezes é verdade | <strong>3</strong> = Muitas vezes é verdade | <strong>4</strong> = Quase sempre é verdade
+        <strong>INSTRUÇÕES:</strong> Em cada questão, por favor selecione a opção que melhor descreva o comportamento da pessoa nos últimos 6 meses.
     </div>
 
     <form id="srs2Form">
@@ -160,8 +162,8 @@
             <div class="form-group">
                 <label>Sexo:</label>
                 <div class="form-group row-flex">
-                    <label class="radio-label"><input type="radio" name="sexo" value="M" required> M</label>
-                    <label class="radio-label"><input type="radio" name="sexo" value="F"> F</label>
+                    <label class="radio-label"><input type="radio" name="sexo" value="M" required> <span>M</span></label>
+                    <label class="radio-label"><input type="radio" name="sexo" value="F"> <span>F</span></label>
                 </div>
             </div>
             <div class="form-group">
@@ -171,18 +173,11 @@
             <div class="form-group">
                 <label>Grau de Parentesco / Relação:</label>
                 <div class="form-group row-flex">
-                    <label class="radio-label"><input type="radio" name="relacao" value="Mãe/Pai" required> Mãe/Pai</label>
-                    <label class="radio-label"><input type="radio" name="relacao" value="Cônjuge"> Cônjuge</label>
-                    <label class="radio-label"><input type="radio" name="relacao" value="Outro"> Outro</label>
+                    <label class="radio-label"><input type="radio" name="relacao" value="Mãe/Pai" required> <span>Mãe/Pai</span></label>
+                    <label class="radio-label"><input type="radio" name="relacao" value="Cônjuge"> <span>Cônjuge</span></label>
+                    <label class="radio-label"><input type="radio" name="relacao" value="Outro"> <span>Outro</span></label>
                 </div>
             </div>
-        </div>
-
-        <div class="scale-legend">
-            <span>1 = Não é verdade</span>
-            <span>2 = Algumas vezes</span>
-            <span>3 = Muitas vezes</span>
-            <span>4 = Quase sempre</span>
         </div>
 
         <div id="quizItems"></div>
@@ -193,12 +188,11 @@
     </form>
 </div>
 
-<!-- Lógica do Firebase usando Módulos (TAG) -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-
+    // Configurações do seu projeto: transporte-fds
     const firebaseConfig = {
         apiKey: "AIzaSyCocyGvi4Si0Mdfdg2CtZuw_7FmFqAwTX4",
         authDomain: "transporte-fds.firebaseapp.com",
@@ -209,11 +203,9 @@
         measurementId: "G-PEB2TCWF5X"
     };
 
-    // Inicializa o Firebase
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // Lista de perguntas do SRS-2
     const itens = [
         "Parece muito mais desconfortável em situações sociais do que quando está sozinha.",
         "As expressões em seu rosto não combinam com o que está dizendo.",
@@ -235,7 +227,7 @@
         "Tem dificuldade em fazer amigos, mesmo tentando dar o melhor de si.",
         "Fica frustrada tentando expressar suas ideias em uma conversa.",
         "Mostra interesses sensoriais incomuns (por exemplo, cheirar seus dedos com frequência) ou estranhos, chacoalha repetidamente pequenos itens.",
-        "É capaz de imitar ações e comportamento de outras pessoas quando é socialmente apropriado fazê-lo.",
+        "É capaz de imitar ações and comportamento de outras pessoas quando é socialmente apropriado fazê-lo.",
         "Interage apropriadamente com outros adultos.",
         "Não participa de atividades em grupo e eventos sociais a menos que seja convidada a fazê-lo.",
         "Tem mais dificuldade do que outras pessoas com mudanças em sua rotina.",
@@ -282,25 +274,35 @@
         "Fica com olhar perdido ou olha fixamente para o nada."
     ];
 
-    // Renderizar os itens na tela
     const container = document.getElementById('quizItems');
     itens.forEach((texto, index) => {
         const itemNum = index + 1;
-        const row = document.createElement('div');
-        row.className = 'item-row';
-        row.innerHTML = `
-            <div class="item-text"><strong>${itemNum}.</strong> ${texto}</div>
-            <div class="item-options">
-                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="1" required> 1</label>
-                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="2"> 2</label>
-                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="3"> 3</label>
-                <label class="radio-label"><input type="radio" name="p_${itemNum}" value="4"> 4</label>
+        const div = document.createElement('div');
+        div.className = 'item-container';
+        div.innerHTML = `
+            <div class="item-text">${itemNum}. ${texto}</div>
+            <div class="item-options-inline">
+                <label class="radio-label">
+                    <input type="radio" name="p_${itemNum}" value="1" required>
+                    <span>1 - Não é verdade</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="p_${itemNum}" value="2">
+                    <span>2 - Algumas vezes</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="p_${itemNum}" value="3">
+                    <span>3 - Muitas vezes</span>
+                </label>
+                <label class="radio-label">
+                    <input type="radio" name="p_${itemNum}" value="4">
+                    <span>4 - Quase sempre</span>
+                </label>
             </div>
         `;
-        container.appendChild(row);
+        container.appendChild(div);
     });
 
-    // Enviar dados para o Firestore ao enviar o formulário
     document.getElementById('srs2Form').addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -308,7 +310,6 @@
         btn.disabled = true;
         btn.innerText = "Enviando...";
 
-        // Monta o objeto com as respostas das perguntas
         const respostasPerguntas = {};
         itens.forEach((_, index) => {
             const itemNum = index + 1;
@@ -316,7 +317,6 @@
             respostasPerguntas[`item_${itemNum}`] = parseInt(valor);
         });
 
-        // Junta com os metadados do paciente
         const payload = {
             nomeAvaliado: document.getElementById('nomeAvaliado').value,
             dataNascimento: document.getElementById('dataNascimento').value,
@@ -329,10 +329,10 @@
         };
 
         try {
-            // Salva na coleção "respostas_srs2" no Firestore
             await addDoc(collection(db, "respostas_srs2"), payload);
             alert("Formulário enviado com sucesso para a nuvem!");
             document.getElementById('srs2Form').reset();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             console.error("Erro ao salvar:", error);
             alert("Ocorreu um erro ao salvar os dados. Verifique o console.");
