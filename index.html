@@ -10,13 +10,13 @@
             background-color: #f4f6f9;
             color: #333;
             margin: 0;
-            padding: 20px;
+            padding: 10px;
         }
         .container {
             max-width: 850px;
             background: #fff;
             margin: 0 auto;
-            padding: 30px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
@@ -24,34 +24,50 @@
             color: #1a365d;
             text-align: center;
             margin-bottom: 5px;
-            font-size: 24px;
+            font-size: 22px;
         }
         h2 {
             color: #4a5568;
             text-align: center;
             margin-top: 0;
-            font-size: 18px;
+            font-size: 16px;
             border-bottom: 2px solid #e2e8f0;
             padding-bottom: 15px;
         }
         .instructions {
             background-color: #ebf8ff;
             border-left: 4px solid #3182ce;
-            padding: 15px;
-            margin-bottom: 25px;
+            padding: 12px;
+            margin-bottom: 20px;
             border-radius: 4px;
-            font-size: 14px;
-            line-height: 1.5;
+            font-size: 13px;
+            line-height: 1.4;
         }
-        .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
+        
+        /* Blocos de Separação entre Avaliado e Respondente */
+        .section-block {
             background: #f7fafc;
             padding: 15px;
             border-radius: 6px;
             border: 1px solid #edf2f7;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: #2b6cb0;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 5px;
+        }
+
+        /* Grid de campos otimizado para celular (uma coluna por padrão) */
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
         .form-group {
             display: flex;
@@ -60,78 +76,95 @@
         .form-group.row-flex {
             flex-direction: row;
             align-items: center;
-            gap: 15px;
-            margin-top: 10px;
+            gap: 10px;
+            margin-top: 5px;
         }
         label {
             font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 14px;
+            margin-bottom: 4px;
+            font-size: 13px;
         }
         input[type="text"], input[type="date"] {
-            padding: 8px;
+            padding: 10px;
             border: 1px solid #cbd5e0;
             border-radius: 4px;
             font-size: 14px;
+            background-color: #fff;
+            -webkit-appearance: none; /* Melhora visual no iOS */
         }
+        
+        /* Estrutura das Perguntas */
         .item-container {
-            padding: 15px 10px;
+            padding: 15px 5px;
             border-bottom: 1px solid #edf2f7;
         }
         .item-container:nth-child(even) {
             background-color: #fcfcfc;
         }
         .item-text {
-            font-size: 15px;
+            font-size: 14px;
             font-weight: 600;
             color: #2d3748;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             line-height: 1.4;
         }
         .item-options-inline {
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            padding-left: 5px;
+            flex-direction: column;
+            gap: 8px;
         }
         .radio-label {
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
-            font-size: 13.5px;
+            font-size: 13px;
             color: #4a5568;
             background: #f7fafc;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 8px 12px;
+            border-radius: 6px;
             border: 1px solid #e2e8f0;
             transition: all 0.2s;
         }
         .radio-label:hover {
             background: #edf2f7;
-            border-color: #cbd5e0;
         }
         .radio-label input[type="radio"]:checked + span {
             font-weight: bold;
             color: #2b6cb0;
         }
+        
         .btn-container {
-            margin-top: 30px;
+            margin-top: 25px;
             text-align: center;
         }
         button {
             background-color: #2b6cb0;
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
+            padding: 12px 40px;
+            font-size: 15px;
             font-weight: bold;
             border-radius: 5px;
             cursor: pointer;
+            width: 100%; /* Botão largo no celular */
+            max-width: 300px;
             transition: background 0.2s;
         }
         button:hover {
             background-color: #2b529a;
+        }
+
+        /* Ajustes para telas maiores (Tablets e Computadores) */
+        @media(min-width: 600px) {
+            body { padding: 20px; }
+            .container { padding: 30px; }
+            h1 { font-size: 24px; }
+            h2 { font-size: 18px; }
+            .meta-grid { grid-template-columns: 1fr 1fr; gap: 15px; }
+            .item-options-inline { flex-direction: row; flex-wrap: wrap; gap: 12px; }
+            .radio-label { border-radius: 20px; padding: 6px 12px; }
+            button { width: auto; }
         }
     </style>
 </head>
@@ -146,36 +179,46 @@
     </div>
 
     <form id="srs2Form">
-        <div class="meta-grid">
-            <div class="form-group">
-                <label for="nomeAvaliado">Nome do avaliado:</label>
-                <input type="text" id="nomeAvaliado" required>
-            </div>
-            <div class="form-group">
-                <label for="dataNascimento">Data de nascimento:</label>
-                <input type="date" id="dataNascimento" required>
-            </div>
-            <div class="form-group">
-                <label for="dataAvaliacao">Data da avaliação:</label>
-                <input type="date" id="dataAvaliacao" required>
-            </div>
-            <div class="form-group">
-                <label>Sexo:</label>
-                <div class="form-group row-flex">
-                    <label class="radio-label"><input type="radio" name="sexo" value="M" required> <span>M</span></label>
-                    <label class="radio-label"><input type="radio" name="sexo" value="F"> <span>F</span></label>
+        
+        <div class="section-block">
+            <div class="section-title">Dados do Avaliado</div>
+            <div class="meta-grid">
+                <div class="form-group">
+                    <label for="nomeAvaliado">Nome do avaliado:</label>
+                    <input type="text" id="nomeAvaliado" value="Rodrigo Barcelos" required>
+                </div>
+                <div class="form-group">
+                    <label for="dataNascimento">Data de nascimento:</label>
+                    <input type="date" id="dataNascimento" value="1993-09-17" required>
+                </div>
+                <div class="form-group">
+                    <label for="dataAvaliacao">Data da avaliação:</label>
+                    <input type="date" id="dataAvaliacao" required>
+                </div>
+                <div class="form-group">
+                    <label>Sexo:</label>
+                    <div class="form-group row-flex">
+                        <label class="radio-label"><input type="radio" name="sexo" value="M" checked required> <span>M</span></label>
+                        <label class="radio-label"><input type="radio" name="sexo" value="F"> <span>F</span></label>
+                    </div>
                 </div>
             </div>
-            <div class="form-group">
-                <label for="nomeRespondente">Nome do respondente:</label>
-                <input type="text" id="nomeRespondente" required>
-            </div>
-            <div class="form-group">
-                <label>Grau de Parentesco / Relação:</label>
-                <div class="form-group row-flex">
-                    <label class="radio-label"><input type="radio" name="relacao" value="Mãe/Pai" required> <span>Mãe/Pai</span></label>
-                    <label class="radio-label"><input type="radio" name="relacao" value="Cônjuge"> <span>Cônjuge</span></label>
-                    <label class="radio-label"><input type="radio" name="relacao" value="Outro"> <span>Outro</span></label>
+        </div>
+
+        <div class="section-block">
+            <div class="section-title">Dados do Respondente</div>
+            <div class="meta-grid">
+                <div class="form-group">
+                    <label for="nomeRespondente">Nome do respondente:</label>
+                    <input type="text" id="nomeRespondente" required>
+                </div>
+                <div class="form-group">
+                    <label>Grau de Parentesco / Relação:</label>
+                    <div class="form-group row-flex">
+                        <label class="radio-label"><input type="radio" name="relacao" value="Mãe/Pai" required> <span>Mãe/Pai</span></label>
+                        <label class="radio-label"><input type="radio" name="relacao" value="Cônjuge"> <span>Cônjuge</span></label>
+                        <label class="radio-label"><input type="radio" name="relacao" value="Outro"> <span>Outro</span></label>
+                    </div>
                 </div>
             </div>
         </div>
@@ -205,6 +248,9 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
+    // Define automaticamente a data atual no campo de preenchimento
+    document.getElementById('dataAvaliacao').value = new Date().toISOString().split('T')[0];
 
     const itens = [
         "Parece muito mais desconfortável em situações sociais do que quando está sozinha.",
@@ -332,6 +378,13 @@
             await addDoc(collection(db, "respostas_srs2"), payload);
             alert("Formulário enviado com sucesso para a nuvem!");
             document.getElementById('srs2Form').reset();
+            
+            // Reaplica os valores padrão após o reset
+            document.getElementById('nomeAvaliado').value = "Rodrigo Barcelos";
+            document.getElementById('dataNascimento').value = "1993-09-17";
+            document.getElementById('dataAvaliacao').value = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="sexo"][value="M"]').checked = true;
+            
             window.scrollTo({ top: 0, behavior: 'smooth' });
         } catch (error) {
             console.error("Erro ao salvar:", error);
