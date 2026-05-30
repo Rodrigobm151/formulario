@@ -84,7 +84,7 @@
 <body>
 
 <div class="container">
-    <h1>Painel de Controle - Respostas do Formulário</h1>
+    <h1>Painel de Controle - Respostas do SRS-2</h1>
 
     <div class="btn-box">
         <button class="btn-refresh" id="btnCarregar">🔄 Atualizar Dados</button>
@@ -113,7 +113,7 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
     import { getFirestore, collection, getDocs, query } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-    // ⚠️ COLOQUE SUAS CREDENCIAIS REAIS AQUI ABAIXO
+    // Configurações do seu projeto: transporte-fds
     const firebaseConfig = {
         apiKey: "AIzaSyCocyGvi4Si0Mdfdg2CtZuw_7FmFqAwTX4",
         authDomain: "transporte-fds.firebaseapp.com",
@@ -129,6 +129,75 @@
     
     let dadosLocais = [];
 
+    // Matriz com os textos exatos das perguntas para mapear no Excel
+    const perguntasTexto = [
+        "Parece muito mais desconfortável em situações sociais do que quando está sozinha.",
+        "As expressões em seu rosto não combinam com o que está dizendo.",
+        "Parece confiante (ou segura) quando está interagindo com outras pessoas.",
+        "Quando há sobrecarga de estímulos, apresenta padrões rígidos e inflexíveis de comportamento, aparentemente estranhos.",
+        "Não percebe quando os outros estão tentando tirar vantagem dela.",
+        "Prefere estar sozinha do que com os outros.",
+        "Demonstra perceber o que os outros estão pensando ou sentindo.",
+        "Se comporta de maneira estranha ou bizarra.",
+        "Precisa da ajuda de outras pessoas para satisfazer suas necessidades básicas.",
+        "Leva as coisas muito \"ao pé da letra\" e não compreende o real significado de uma conversa.",
+        "É autoconfiante.",
+        "É capaz de comunicar seus sentimentos para as outras pessoas.",
+        "É estranha na \"tomada de vez\" das interações com seus colegas (por exemplo, não parece entender a reciprocidade de uma conversa).",
+        "Não tem boa coordenação.",
+        "Reconhece e responde de forma apropriada às mudanças no tom de voz e expressões faciais de outras pessoas.",
+        "Evita o contato visual ou tem contato visual diferente.",
+        "Reconhece quando algo é injusto.",
+        "Tem dificuldade em fazer amigos, mesmo tentando dar o melhor de si.",
+        "Fica frustrada tentando expressar suas ideias em uma conversa.",
+        "Mostra interesses sensoriais incomuns (por exemplo, cheirar seus dedos com frequência) ou estranhos, chacoalha repetidamente pequenos itens.",
+        "É capaz de imitar ações e comportamento de outras pessoas quando é socialmente apropriado fazê-lo.",
+        "Interage apropriadamente com outros adultos.",
+        "Não participa de atividades em grupo e eventos sociais a menos que seja convidada a fazê-lo.",
+        "Tem mais dificuldade do que outras pessoas com mudanças em sua rotina.",
+        "Não parece se importar em estar fora de sintonia ou em um \"mundo\" diferente dos outros.",
+        "Oferece conforto para os outros quando estão tristes.",
+        "Evita iniciar interações sociais com outros adultos.",
+        "Pensa ou fala sobre a mesma coisa repetidamente.",
+        "É considerada estranha ou esquisita pelas outras pessoas.",
+        "Fica perturbada em uma situação com muitas coisas acontecendo.",
+        "Não consegue tirar algo da sua mente uma vez que começa a pensar sobre isso.",
+        "Tem boa higiene pessoal.",
+        "É socialmente desajeitada, mesmo quando tenta ser educada.",
+        "Evita pessoas que querem se aproximar dela por meio de contato afetivo.",
+        "Tem dificuldade em acompanhar o fluxo de uma conversa normal.",
+        "Tem dificuldade em se relacionar com os membros da família.",
+        "Tem dificuldade em se relacionar com adults.",
+        "Responde adequadamente às mudanças de humor das outras pessoas (por exemplo, quando o humor de um amigo muda de feliz para triste).",
+        "Tem uma variedade de interesses extraordinariamente incomuns.",
+        "É imaginativa sem perder contato com a realidade.",
+        "Muda de uma atividade para outra sem objetivo aparente.",
+        "Parece excessivamente sensível aos sons, texturas ou cheiros.",
+        "Gosta de se mostrar \"boa de conversa\" (conversa informal com os outros).",
+        "Não entende como os acontecimentos estão relacionados entre si (causa e efeito), da mesma forma que outros adultos.",
+        "Geralmente fica interessada no que as pessoas próximas estão prestando atenção.",
+        "Tem expressão facial excessivamente séria.",
+        "Ri em momentos inapropriados.",
+        "Tem senso de humor e entende as piadas.",
+        "É extremamente hábil em tarefas intelectuais ou computacionais, mas não consegue fazer tão bem a maioria das outras tarefas.",
+        "Têm comportamentos estranhos e repetitivos.",
+        "Tem dificuldade em responder perguntas diretamente e acaba falando em torno do assunto.",
+        "Sabe quando está falando muito alto ou fazendo muito barulho.",
+        "Fala com as pessoas com um tom de voz incomum (por exemplo, fala como um robô ou como se estivesse dando uma palestra).",
+        "Parece agir com as pessoas como se elas fossem objetos.",
+        "Sabe quando está muito próxima ou invadindo o espaço de alguém.",
+        "Caminha entre duas pessoas que estão conversando.",
+        "Isolada; tende a não deixar sua casa.",
+        "Concentra-se demais em partes das coisas ao invés de ver o todo.",
+        "É excessivamente desconfiada.",
+        "É emocionalmente distante, não demonstrando seus sentimentos.",
+        "É inflexível e tem dificuldade para mudar de ideia.",
+        "Dá explicações incomuns ou ilógicas do porquê de fazer as coisas.",
+        "Toca ou cumprimenta os outros de uma maneira incomum.",
+        "Fica muito agitada em situações sociais.",
+        "Fica com olhar perdido ou olha fixamente para o nada."
+    ];
+
     const btnCarregar = document.getElementById('btnCarregar');
     const btnExportarTudo = document.getElementById('btnExportarTudo');
     const status = document.getElementById('status');
@@ -143,7 +212,6 @@
         dadosLocais = [];
 
         try {
-            // Consulta direta e sem ordenação forçada para evitar travamento por falta de índice
             const q = query(collection(db, "respostas_srs2"));
             const querySnapshot = await getDocs(q);
             
@@ -174,7 +242,6 @@
                 corpoTabela.appendChild(tr);
             });
 
-            // Ordena localmente os dados na tabela para mostrar o mais recente em primeiro lugar
             dadosLocais.sort((a, b) => new Date(b.enviadoEm) - new Date(a.enviadoEm));
 
             status.style.display = "none";
@@ -193,6 +260,7 @@
         }
     }
 
+    // Exportação de 1 Paciente (Vertical) com o texto completo da pergunta
     function baixarExcelIndividual(id) {
         const paciente = dadosLocais.find(d => d.id === id);
         if (!paciente) return;
@@ -207,30 +275,36 @@
             ["Relação", paciente.relacao],
             ["Enviado via Web em", paciente.enviadoEm],
             [], 
-            ["Nº ITEM", "RESPOSTA (1 a 4)"]
+            ["PERGUNTA / ITEM", "RESPOSTA (1 a 4)"]
         ];
 
-        for (let i = 1; i <= 65; i++) {
-            estrutura.push([`Item ${i}`, paciente.respostas ? paciente.respostas[`item_${i}`] : "N/A"]);
-        }
+        // Mapeia o texto da pergunta em vez de "Item X"
+        perguntasTexto.forEach((textoPergunta, index) => {
+            const itemNum = index + 1;
+            const respostaVal = paciente.respostas ? paciente.respostas[`item_${itemNum}`] : "N/A";
+            estrutura.push([`${itemNum}. ${textoPergunta}`, respostaVal]);
+        });
 
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.aoa_to_sheet(estrutura);
-        ws['!cols'] = [{ wch: 25 }, { wch: 30 }];
+        // Alarga a primeira coluna para que o texto da pergunta não fique cortado
+        ws['!cols'] = [{ wch: 100 }, { wch: 20 }];
         XLSX.utils.book_append_sheet(wb, ws, "Resultado SRS-2");
         XLSX.writeFile(wb, `SRS2_${paciente.nomeAvaliado.replace(/\s+/g, '_')}.xlsx`);
     }
 
+    // Exportação Geral (Horizontal) com o texto completo da pergunta no cabeçalho
     function exportarTudoParaExcel() {
         if (dadosLocais.length === 0) {
             alert("Não há dados carregados para exportar.");
             return;
         }
 
+        // Cabeçalho dinâmico contendo as informações e os textos das 65 perguntas
         const cabecalho = ["Nome do Avaliado", "Data Nasc.", "Data Avaliação", "Sexo", "Respondente", "Relação", "Data Envio"];
-        for (let i = 1; i <= 65; i++) {
-            cabecalho.push(`Item ${i}`);
-        }
+        perguntasTexto.forEach((textoPergunta, index) => {
+            cabecalho.push(`${index + 1}. ${textoPergunta}`);
+        });
 
         const matrizExcel = [cabecalho];
 
@@ -259,7 +333,6 @@
     btnCarregar.addEventListener('click', puxarDados);
     btnExportarTudo.addEventListener('click', exportarTudoParaExcel);
 
-    // Tenta carregar automaticamente ao entrar
     puxarDados();
 </script>
 
